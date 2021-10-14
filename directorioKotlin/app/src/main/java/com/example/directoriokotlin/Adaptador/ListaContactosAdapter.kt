@@ -11,57 +11,51 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.directoriokotlin.Modelos.Contacto
 import com.example.directoriokotlin.R
 import kotlinx.android.synthetic.main.activity_contacto.view.*
+import kotlinx.android.synthetic.main.activity_main.view.*
 import kotlinx.android.synthetic.main.item_list.view.*
 
 
-class ListaContactosAdapter : RecyclerView.Adapter<ListaContactosAdapter.ViewHolder>() {
-    var dataset: MutableList<Contacto> = ArrayList()
-    lateinit var  context: Context
-    lateinit var mOnContactoListener: onContactoListener
+class ListaContactosAdapter (
+    private var dataset: MutableList<Contacto> = ArrayList(),
+    private  var  context: Context,
+    private var itemClickListener: OnContactoListener
+): RecyclerView.Adapter<ListaContactosAdapter.ViewHolder>() {
 
-    fun ListaContactosAdapter(itemList: List<Contacto>, context: Context, onContactoListener: onContactoListener){
-        this.context = context
-        this.mOnContactoListener = onContactoListener
+    interface OnContactoListener{
+        fun onContactoClick(position: Int)
+        fun onDeleteclick(contacto: Contacto)
+
     }
 
-    override fun onCreateViewHolder(
-        parent: ViewGroup,
-        viewType: Int
-    ): ListaContactosAdapter.ViewHolder {
-        val mInflater: LayoutInflater = LayoutInflater.from(parent.context)
-        var view: View = mInflater.inflate(R.layout.item_list,parent,false)
-        return ListaContactosAdapter.ViewHolder(view,mOnContactoListener)
+    fun ListaContactosAdapter(itemList: MutableList<Contacto>, context: Context, itemClickListener: OnContactoListener){
+        this.context = context
+        this.dataset = itemList
+        this.itemClickListener = itemClickListener
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListaContactosAdapter.ViewHolder {
+        return ViewHolder(
+            LayoutInflater.from(context).inflate(R.layout.item_list,parent,false)
+        )
     }
     override fun onBindViewHolder(holder: ListaContactosAdapter.ViewHolder, position: Int) {
-
-        holder.bindData(dataset.get(position))
-
-    }
-    fun adicionarListaContacto(contacto: Contacto){
-        dataset.add(contacto)
-        notifyDataSetChanged()
+        holder.bindData(dataset[position],position)
     }
 
-    class ViewHolder(view: View, onContactoListener: onContactoListener) : RecyclerView.ViewHolder(view), View.OnClickListener{
-        val nombre = view.findViewById(R.id.nombreUsuario) as TextView
-        val apellidos = view.findViewById(R.id.numeroUsuario) as TextView
-        var onContactoListener = onContactoListener
+     inner class ViewHolder (itemView: View) : RecyclerView.ViewHolder(itemView) {
+         val nombre = itemView.findViewById(R.id.nombreUsuario) as TextView
+         val apellidos = itemView.findViewById(R.id.numeroUsuario) as TextView
 
-        fun bindData(contacto: Contacto){
-            nombre.text = contacto.nombre + " " + contacto.apellido
-            apellidos.text = contacto.telefono
-            itemView.setOnClickListener(this)
-            this.onContactoListener = onContactoListener
-        }
-        override fun onClick(v: View){
-            onContactoListener.onContactoClick(adapterPosition)
-        }
+         fun bindData(contacto: Contacto, position: Int) {
+             nombre.text = contacto.nombre + " " + contacto.apellido
+             apellidos.text = contacto.telefono
+             itemView.setOnClickListener{itemClickListener.onContactoClick(position)}
+             itemView.btnBorrar.setOnClickListener{itemClickListener.onDeleteclick(contacto)}
+         }
 
     }
-     interface onContactoListener{
-        fun onContactoClick(position: Int)
 
-    }
+
     override fun getItemCount(): Int{
         return dataset.size
     }

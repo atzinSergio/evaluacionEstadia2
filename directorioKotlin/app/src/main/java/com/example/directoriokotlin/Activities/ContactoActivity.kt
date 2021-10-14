@@ -28,15 +28,18 @@ class ContactoActivity : AppCompatActivity(){
         if(comando.equals("Editar")){
             val Contacto = intent.getSerializableExtra("contacto") as Contacto //Recibir objeto Contacto
             txtNombre.setText(Contacto.nombre)
-            txtApellidos.setText(Contacto.nombre)
-            txtTelefono.setText(Contacto.nombre)
-            txtEmail.setText(Contacto.nombre)
+            txtApellidos.setText(Contacto.apellido)
+            txtTelefono.setText(Contacto.telefono)
+            txtEmail.setText(Contacto.eMail)
             txtComando.setText(comando)
             btnEjecutarAccion.setText(comando)
             Contacto1 = Contacto
         }else{
             txtComando.setText(def)
             btnEjecutarAccion.setText(def)
+        }
+        backIcon.setOnClickListener{
+            finish()
         }
 
         btnEjecutarAccion.setOnClickListener {
