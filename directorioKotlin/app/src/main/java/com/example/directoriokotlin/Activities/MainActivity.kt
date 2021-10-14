@@ -40,8 +40,6 @@ class MainActivity : AppCompatActivity(), ListaContactosAdapter.OnContactoListen
 
         btnCrearContacto.setOnClickListener{
             val intent = Intent(this, ContactoActivity::class.java)
-            intent.putExtra("accion","Añadir")
-
             startActivity(intent)
         }
     }
@@ -49,7 +47,6 @@ class MainActivity : AppCompatActivity(), ListaContactosAdapter.OnContactoListen
     override fun onContactoClick(position: Int) {
         val intent = Intent(this, ContactoActivity::class.java)
         intent.putExtra("contacto",listaContactos[position])
-        intent.putExtra("accion", "Editar")
         startActivity(intent)
     }
 

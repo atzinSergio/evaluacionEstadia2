@@ -10,5 +10,5 @@ class Contacto(
     val telefono: String,
     val eMail: String,
     @PrimaryKey(autoGenerate = true)
-    val idContacto: Int = 0
+    var idContacto: Int = 0
     ) :  Serializable

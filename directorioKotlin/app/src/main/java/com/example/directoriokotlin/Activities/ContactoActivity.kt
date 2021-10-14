@@ -21,69 +21,72 @@ class ContactoActivity : AppCompatActivity(){
         setContentView(R.layout.activity_contacto)
 
         val database = AppDatabase.getDatabase(this)
-        var Contacto1 = Contacto("","","","")
-        val comando: String =  intent.getStringExtra("accion") as String//Recibir nombre de accion
-        val def = "Añadir"
 
-        if(comando.equals("Editar")){
-            val Contacto = intent.getSerializableExtra("contacto") as Contacto //Recibir objeto Contacto
-            txtNombre.setText(Contacto.nombre)
-            txtApellidos.setText(Contacto.apellido)
-            txtTelefono.setText(Contacto.telefono)
-            txtEmail.setText(Contacto.eMail)
-            txtComando.setText(comando)
-            btnEjecutarAccion.setText(comando)
-            Contacto1 = Contacto
+        var idContacto: Int? = null
+
+        if(!intent.hasExtra("contacto")){ //AÑADIR OBJETO
+            txtComando.setText("Añadir")
+            btnEjecutarAccion.setText("Añadir")
+
+            btnEjecutarAccion.setOnClickListener {
+                if(!txtNombre.text.toString().equals("") && !txtApellidos.text.toString().equals("") && !txtTelefono.text.toString().equals("") && !txtEmail.text.toString().equals("")){
+                    val nombre = txtNombre.text.toString()
+                    val apellidos = txtApellidos.text.toString()
+                    val telefono = txtTelefono.text.toString()
+                    val email = txtEmail.text.toString()
+                    var contactoNuevo = Contacto(nombre,apellidos,telefono,email)
+                    CoroutineScope(Dispatchers.IO).launch {
+                        database.contactos().insertarContactos(contactoNuevo)
+                        this@ContactoActivity.finish()
+                    }
+                }else { //Si existen campos vacios, no permite añadir registro
+                    AlertDialog.Builder(this)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setTitle("Campos Vacios")
+                        .setMessage("Por favor, rellena todos los campos")
+                        .setPositiveButton("OK",null)
+                        .show()
+                }
+            } // Finaliza Listener Acción
+
         }else{
-            txtComando.setText(def)
-            btnEjecutarAccion.setText(def)
+            val contacto = intent.getSerializableExtra("contacto") as Contacto //Recibir objeto Contacto
+
+            //Rellenar Datos del Contacto
+            txtNombre.setText(contacto.nombre)
+            txtApellidos.setText(contacto.apellido)
+            txtTelefono.setText(contacto.telefono)
+            txtEmail.setText(contacto.eMail)
+            txtComando.setText("Editar")
+            btnEjecutarAccion.setText("Editar")
+            //Fin Rellenar Datos del Contacto
+
+            btnEjecutarAccion.setOnClickListener {
+                if(!txtNombre.text.toString().equals("") && !txtApellidos.text.toString().equals("") && !txtTelefono.text.toString().equals("") && !txtEmail.text.toString().equals("")){
+                    val nombre = txtNombre.text.toString()
+                    val apellidos = txtApellidos.text.toString()
+                    val telefono = txtTelefono.text.toString()
+                    val email = txtEmail.text.toString()
+                    idContacto = contacto.idContacto
+                    var contactoNuevo = Contacto(nombre,apellidos,telefono,email)
+                    contactoNuevo.idContacto = idContacto as Int
+                    CoroutineScope(Dispatchers.IO).launch {
+                        database.contactos().actualizarContacto(contactoNuevo)
+                        this@ContactoActivity.finish()
+                    }
+                }else { //Si existen campos vacios, no permite actualizar registro
+                    AlertDialog.Builder(this)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setTitle("Campos Vacios")
+                        .setMessage("Por favor, rellena todos los campos")
+                        .setPositiveButton("OK",null)
+                        .show()
+                }
+            } // Finaliza Listener Acción
         }
         backIcon.setOnClickListener{
             finish()
         }
-
-        btnEjecutarAccion.setOnClickListener {
-            if(comando.equals(def) && !txtNombre.text.toString().equals("") && !txtApellidos.text.toString().equals("") && !txtTelefono.text.toString().equals("") && !txtEmail.text.toString().equals("")){
-                val nombre = txtNombre.text.toString()
-                val apellidos = txtApellidos.text.toString()
-                val telefono = txtTelefono.text.toString()
-                val email = txtEmail.text.toString()
-
-                val contactoNuevo = Contacto(nombre,apellidos,telefono,email)
-                CoroutineScope(Dispatchers.IO).launch {
-                    database.contactos().insertarContactos(contactoNuevo)
-
-                    this@ContactoActivity.finish()
-                }
-            }else{
-                 AlertDialog.Builder(this)
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .setTitle("Campos Vacios")
-                    .setMessage("Por favor, rellena todos los campos")
-                    .setPositiveButton("OK",null)
-                    .show()
-            }
-            if(comando == "Editar" && !txtNombre.text.toString().equals("") && !txtApellidos.text.toString().equals("") && !txtTelefono.text.toString().equals("") && !txtEmail.text.toString().equals("")){
-                val nombre = txtNombre.text.toString()
-                val apellidos = txtApellidos.text.toString()
-                val telefono = txtTelefono.text.toString()
-                val email = txtEmail.text.toString()
-                CoroutineScope(Dispatchers.IO).launch {
-                    database.contactos().actualizarContacto(Contacto1)
-                    this@ContactoActivity.finish()
-                }
-            }else{
-                AlertDialog.Builder(this)
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .setTitle("Campos Vacios")
-                    .setMessage("Por favor, rellena todos los campos")
-                    .setPositiveButton("OK",null)
-                    .show()
-            }
-        }
-
-
-
-
     }
+
 }
