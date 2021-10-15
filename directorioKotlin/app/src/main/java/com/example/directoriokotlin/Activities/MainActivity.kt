@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity(), ListaContactosAdapter.OnContactoListen
         AlertDialog.Builder(this)
             .setIcon(android.R.drawable.ic_dialog_alert)
             .setTitle("Eliminar Contacto")
-            .setMessage("¿Estás seguro de que deceas eliminar este contacto?")
+            .setMessage("¿Estás seguro de que deseas eliminar este contacto?")
             .setPositiveButton(
                 "Yes"
             ) { dialog, which ->
